@@ -76,7 +76,7 @@
               <span class="author-block">
                 <a>Ayaan Raina</a>,</span>
               <span class="author-block">
-                <a>Yash Goyal</a>,</span>
+                <a>Yash Goyal</a></span>
             </div>
 
             <div class="is-size-5 publication-authors">
@@ -105,12 +105,16 @@
 
   <section class="hero teaser">
     <div class="container is-max-desktop">
-      <div class="column is-centered has-text-centered">
-        <img class="algorithm" src="./static/images/MADR_frontfig.png" style="width: 60%; margin-top: -50px" />
+      <div class="columns is-centered" style="margin-top: -30px;">
+        <div class="column is-half has-text-centered">
+          <img src="./static/images/enviornment.png" style="width: 100%; height: auto;" />
+        </div>
+        <div class="column is-half has-text-centered">
+          <img src="./static/images/map.png" style="width: 100%; height: auto;" />
+        </div>
       </div>
-      <h3 class="subtitle has-text-justified" style="font-size: 14px; color: #444444;">
-        A graphical abstract of <span class="small-caps-text">MADR</span> and the robotic experiments. In this work, we propose enriching self-supervised learning of HJ-PDE's, i.e. DeepReach, with supervision given by the best sampled game rollout (top left), 
-          where the opponents policy is defined by the current value approximation (top right). We demonstrate this approach performs across games with general dynamics (bottom), namely with TurtleBots, Drones and Humanoid experiments.
+      <h3 class="subtitle has-text-centered" style="font-size: 14px; color: #444444; margin-top: 0.75rem;">
+        The simulated indoor environment (left) and the corresponding occupancy grid map built by the drone (right).
       </h3>
       <hr class="section-divider">
     </div>
@@ -122,12 +126,20 @@
         <div class="column is-four-fifths">
           <h2 class="title is-3">Abstract</h2>
           <div class="content has-text-justified">
-             Hamilton-Jacobi (HJ) Reachability offers a framework for generating safe value functions and policies in the face of adversarial disturbance, but is limited by the curse of dimensionality. Physics-informed deep learning is able to overcome this infeasibility, 
-             but itself suffers from slow and inaccurate convergence, primarily due to weak PDE gradients and the complexity of self-supervised learning. A few works, recently, have demonstrated that enriching the self-supervision process with regular supervision 
-             (based on the nature of the optimal control problem), greatly accelerates convergence and solution quality, however, these have been limited to single player problems and simple games. In this work, we introduce <span class="small-caps-text">MADR</span>, 
-             a general framework to robustly approximate the two-player, zero-sum differential game value function. In doing so, <span class="small-caps-text">MADR</span> yields the corresponding optimal strategies for both players in zero-sum games as well as safe policies 
-             for worst-case robustness. We test <span class="small-caps-text">MADR</span> on a multitude of high-dimensional simulated and real robotic agents with varying dynamics and games, finding that our approach significantly out-performs state-of-the-art baselines in 
-             simulation and produces impressive results in hardware.
+            Autonomous drones can assist firefighting operations by exploring hazardous environments and locating fire sources 
+            without risking human responders. This project develops a simulated autonomous firefighting drone capable of mapping 
+            unknown environments, localizing itself, and detecting fires. The system is implemented in the PyBullet physics 
+            simulator using the gym-pybullet-drones framework. A LiDAR sensor is simulated using radial ray casting to 
+            generate range measurements, which are used to construct a 2D occupancy grid map of the environment. Drone 
+            localization is performed using dead reckoning combined with an Extended Kalman Filter (EKF) to fuse motion 
+            predictions with noisy sensor observations.
+
+            To detect fires, a computer vision model processes images from a simulated onboard camera to identify fire 
+            regions in the environment. Once a fire is detected, its location is recorded in the map and the drone 
+            navigates toward the target using grid-based path planning. Sensor noise is incorporated into position and 
+            LiDAR measurements to simulate realistic operating conditions. Experimental results demonstrate that the 
+            system can autonomously explore an unknown environment, build a map, detect fires using vision, and navigate 
+            safely toward detected fire locations.
           </div>
         </div>
       </div>
@@ -148,19 +160,55 @@
   </section>
   <section class="section">
     <div class="container is-max-desktop">
-      <!-- Abstract. -->
       <div class="columns is-centered has-text-centered">
         <div class="column is-full">
-          <h2 class="title is-3">Algorithm</h2>
-           <div class="content has-text-centered">
-             <img class="algorithm" src="./static/images/droneFigure.png" style="width: 80%; margin-bottom: 20px;" />
-           </div>
-           <div class="content has-text-justified">
-             Graphical depiction of the MPC formulation combining both player's rollouts in the loss function for the proposed MPG-guided adversarial PINN training.
-             We augment the training loss function for the neural net, combining the MPC rollouts for both players as an additional loss term to the traditional PDE loss. 
-             Essentially, for each player, we generate its own actions using sampling based MPC, and the opponents actions from the current approximation of the learned value 
-             at each timestep along the trajectory rollout.
-           </div>
+          <h2 class="title is-3">Methods</h2>
+
+          <div class="content has-text-justified">
+            <h4 class="title is-5" style="margin-bottom: 0.5rem;">Simulation Environment</h4>
+            <p>
+              The system is implemented in the PyBullet physics engine using the gym-pybullet-drones framework. A quadrotor
+              drone model is simulated with realistic dynamics and controlled using a PID-based flight controller. The
+              controller stabilizes the drone and enables waypoint tracking during exploration and navigation. Indoor
+              environments with walls and obstacles are created to represent cluttered spaces where fires may occur.
+            </p>
+
+            <h4 class="title is-5" style="margin-bottom: 0.5rem; margin-top: 1.5rem;">LiDAR Sensing and Mapping</h4>
+            <p>
+              A planar LiDAR sensor is simulated using radial ray casting from the drone's position. Each ray returns the
+              distance to the nearest obstacle, which is projected into the global frame using the drone's estimated pose.
+              These measurements are used to update a 2D occupancy grid map, allowing the drone to build a representation
+              of the environment while exploring.
+            </p>
+
+            <h4 class="title is-5" style="margin-bottom: 0.5rem; margin-top: 1.5rem;">Localization</h4>
+            <p>
+              The drone's pose is initially predicted using dead reckoning, where motion is estimated from control inputs
+              and a simulated IMU. An Extended Kalman Filter (EKF) is used to fuse these predictions with sensor
+              observations and reduce drift. Sensor noise is introduced to improve realism, including Gaussian noise in
+              position measurements and LiDAR range readings. The EKF incorporates process noise to account for
+              uncertainty in the drone's motion model and produces a filtered estimate of the drone's state.
+            </p>
+
+            <h4 class="title is-5" style="margin-bottom: 0.5rem; margin-top: 1.5rem;">Fire Detection Using Computer Vision</h4>
+            <p>
+              Instead of detecting fires using ray casting, the system uses a computer vision model operating on images
+              captured from the drone's onboard camera. The model analyzes RGB images to identify fire regions within the
+              scene. When a fire is detected, its location is estimated relative to the drone and projected into the
+              global map frame. This allows detected fires to be stored within the occupancy map and treated as
+              navigation targets.
+            </p>
+
+            <h4 class="title is-5" style="margin-bottom: 0.5rem; margin-top: 1.5rem;">Exploration and Navigation</h4>
+            <p>
+              During the exploration phase, the drone moves through the environment while updating the occupancy map.
+              Once a fire is detected, the system switches to goal-directed navigation. A grid-based A* path planner
+              computes a collision-free path through the occupancy grid from the drone's current position to the
+              detected fire location. The PID controller then tracks the planned waypoints until the drone reaches and
+              hovers over the target location.
+            </p>
+          </div>
+
         </div>
       </div>
     </div>
